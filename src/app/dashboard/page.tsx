@@ -63,6 +63,7 @@ export default async function Dashboard() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Applicant</TableHead>
+                    <TableHead>Phone</TableHead>
                     <TableHead>Job Type</TableHead>
                     <TableHead>Location</TableHead>
                   </TableRow>
@@ -74,6 +75,7 @@ export default async function Dashboard() {
                         <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
                         <div className="text-sm text-muted-foreground">{app.email}</div>
                       </TableCell>
+                      <TableCell>{app.phone}</TableCell>
                       <TableCell>{app.jobType}</TableCell>
                       <TableCell>{app.location}</TableCell>
                     </TableRow>
@@ -96,6 +98,7 @@ export default async function Dashboard() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Client</TableHead>
+                    <TableHead>Phone</TableHead>
                     <TableHead>Company</TableHead>
                     <TableHead>Date</TableHead>
                   </TableRow>
@@ -107,6 +110,7 @@ export default async function Dashboard() {
                         <div className="font-medium">{inq.contactPerson}</div>
                         <div className="text-sm text-muted-foreground">{inq.email}</div>
                       </TableCell>
+                      <TableCell>{inq.phone}</TableCell>
                       <TableCell>{inq.companyName}</TableCell>
                       <TableCell>{inq.submittedAt}</TableCell>
                     </TableRow>

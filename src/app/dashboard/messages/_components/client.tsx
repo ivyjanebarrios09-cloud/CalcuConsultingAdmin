@@ -47,6 +47,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
   const filteredMessages = messages.filter((msg) =>
     msg.name.toLowerCase().includes(search.toLowerCase()) ||
     msg.email.toLowerCase().includes(search.toLowerCase()) ||
+    msg.phone.toLowerCase().includes(search.toLowerCase()) ||
     msg.message.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -89,6 +90,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Sender</TableHead>
+              <TableHead>Phone</TableHead>
               <TableHead>Message</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -97,7 +99,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
           <TableBody>
             {filteredMessages.length === 0 ? (
                <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No messages found.
                 </TableCell>
               </TableRow>
@@ -108,6 +110,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
                     <div className="font-medium">{msg.name}</div>
                     <div className="text-sm text-muted-foreground">{msg.email}</div>
                   </TableCell>
+                  <TableCell>{msg.phone}</TableCell>
                   <TableCell className="max-w-xs truncate">{msg.message}</TableCell>
                   <TableCell>{msg.submittedAt as string}</TableCell>
                   <TableCell className="text-right">

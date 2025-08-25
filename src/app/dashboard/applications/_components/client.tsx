@@ -47,6 +47,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
   const filteredApplications = applications.filter((app) =>
     `${app.firstName} ${app.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     app.email.toLowerCase().includes(search.toLowerCase()) ||
+    app.phone.toLowerCase().includes(search.toLowerCase()) ||
     app.jobType.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -89,6 +90,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Applicant</TableHead>
+              <TableHead>Phone</TableHead>
               <TableHead>Job Type</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Date Applied</TableHead>
@@ -98,7 +100,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
           <TableBody>
             {filteredApplications.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   No applications found.
                 </TableCell>
               </TableRow>
@@ -109,6 +111,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
                     <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
                     <div className="text-sm text-muted-foreground">{app.email}</div>
                   </TableCell>
+                  <TableCell>{app.phone}</TableCell>
                   <TableCell>{app.jobType}</TableCell>
                   <TableCell>{app.location}</TableCell>
                   <TableCell>{app.submittedAt as string}</TableCell>

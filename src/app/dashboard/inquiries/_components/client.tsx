@@ -47,6 +47,8 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
   const filteredInquiries = inquiries.filter((inq) =>
     inq.contactPerson.toLowerCase().includes(search.toLowerCase()) ||
     inq.companyName.toLowerCase().includes(search.toLowerCase()) ||
+    inq.email.toLowerCase().includes(search.toLowerCase()) ||
+    inq.phone.toLowerCase().includes(search.toLowerCase()) ||
     inq.jobTitles.join(', ').toLowerCase().includes(search.toLowerCase())
   );
 
@@ -90,6 +92,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Contact Person</TableHead>
+              <TableHead>Phone</TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Job Titles</TableHead>
               <TableHead>Date</TableHead>
@@ -99,7 +102,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
           <TableBody>
              {filteredInquiries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   No inquiries found.
                 </TableCell>
               </TableRow>
@@ -110,6 +113,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
                     <div className="font-medium">{inq.contactPerson}</div>
                     <div className="text-sm text-muted-foreground">{inq.email}</div>
                   </TableCell>
+                  <TableCell>{inq.phone}</TableCell>
                   <TableCell>{inq.companyName}</TableCell>
                   <TableCell>{inq.jobTitles.join(', ')}</TableCell>
                   <TableCell>{inq.submittedAt as string}</TableCell>
