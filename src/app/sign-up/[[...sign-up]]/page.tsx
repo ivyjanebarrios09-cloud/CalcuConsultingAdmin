@@ -30,7 +30,12 @@ export default function SignUpPage() {
     const checkUserExists = async () => {
       try {
         const response = await fetch('/api/auth/check-user');
-        const { hasUsers } = await response.json();
+        const { hasUsers, error } = await response.json();
+
+        if (error) {
+           throw new Error(error);
+        }
+
         if (hasUsers) {
           router.push('/sign-in');
           toast({
@@ -41,10 +46,10 @@ export default function SignUpPage() {
         } else {
           setIsSignUpAllowed(true);
         }
-      } catch (error) {
+      } catch (err: any) {
         toast({
           title: 'Error',
-          description: 'Could not verify admin existence. Please try again.',
+          description: 'Could not verify admin existence. ' + err.message,
           variant: 'destructive',
         });
         router.push('/sign-in');
@@ -66,6 +71,10 @@ export default function SignUpPage() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+     if (!isSignUpAllowed) {
+      toast({ title: "Sign-up is disabled", variant: "destructive" });
+      return;
+    }
     try {
       const res = await createUserWithEmailAndPassword(values.email, values.password);
       if (res) {
@@ -104,7 +113,7 @@ export default function SignUpPage() {
         <CardHeader>
           <CardTitle className="text-xl">Sign Up</CardTitle>
           <CardDescription>
-            Enter your information to create an account
+            Enter your information to create the admin account
           </CardDescription>
         </CardHeader>
         <CardContent>
