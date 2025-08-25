@@ -30,6 +30,8 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
 import type { ContactMessage } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { doc, deleteDoc } from "firebase/firestore";
 
 type MessagesClientProps = {
   data: ContactMessage[];
@@ -48,15 +50,25 @@ export function MessagesClient({ data }: MessagesClientProps) {
     msg.message.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selectedMessage) return;
-    setMessages(messages.filter((msg) => msg.id !== selectedMessage.id));
-    toast({
-      title: "Message Deleted",
-      description: `Message from ${selectedMessage.name} has been deleted.`,
-    });
-    setIsDeleteDialogOpen(false);
-    setSelectedMessage(null);
+    try {
+      await deleteDoc(doc(db, "contacts", selectedMessage.id));
+      setMessages(messages.filter((msg) => msg.id !== selectedMessage.id));
+      toast({
+        title: "Message Deleted",
+        description: `Message from ${selectedMessage.name} has been deleted.`,
+      });
+    } catch (error) {
+       toast({
+        title: "Error deleting message",
+        description: "There was a problem deleting the message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setSelectedMessage(null);
+    }
   };
 
   return (
@@ -83,38 +95,46 @@ export function MessagesClient({ data }: MessagesClientProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredMessages.map((msg) => (
-              <TableRow key={msg.id}>
-                <TableCell>
-                  <div className="font-medium">{msg.name}</div>
-                  <div className="text-sm text-muted-foreground">{msg.email}</div>
-                </TableCell>
-                <TableCell className="max-w-xs truncate">{msg.message}</TableCell>
-                <TableCell>{msg.submittedAt}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onSelect={() => {
-                          setSelectedMessage(msg);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {filteredMessages.length === 0 ? (
+               <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center">
+                  No messages found.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredMessages.map((msg) => (
+                <TableRow key={msg.id}>
+                  <TableCell>
+                    <div className="font-medium">{msg.name}</div>
+                    <div className="text-sm text-muted-foreground">{msg.email}</div>
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">{msg.message}</TableCell>
+                  <TableCell>{msg.submittedAt as string}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onSelect={() => {
+                            setSelectedMessage(msg);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

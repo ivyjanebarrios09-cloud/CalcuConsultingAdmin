@@ -1,7 +1,9 @@
 import { InquiriesClient } from './_components/client';
-import { inquiries } from '@/lib/data';
+import { getInquiries } from '@/lib/data';
 
-export default function InquiriesPage() {
+export default async function InquiriesPage() {
+  const inquiries = await getInquiries();
+  
   return (
     <div className="space-y-4">
       <div>

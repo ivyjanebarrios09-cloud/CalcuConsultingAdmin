@@ -1,9 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Briefcase, HelpCircle, MessageSquare } from "lucide-react";
-import { applications, inquiries, contactMessages } from "@/lib/data";
+import { getApplications, getInquiries, getContactMessages } from "@/lib/data";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const applications = await getApplications();
+  const inquiries = await getInquiries();
+  const contactMessages = await getContactMessages();
+
   const recentApplications = applications.slice(0, 5);
   const recentInquiries = inquiries.slice(0, 5);
 
@@ -98,7 +102,7 @@ export default function Dashboard() {
                       <div className="text-sm text-muted-foreground">{inq.email}</div>
                     </TableCell>
                     <TableCell>{inq.companyName}</TableCell>
-                    <TableCell>{inq.submittedAt}</TableCell>
+                    <TableCell>{inq.submittedAt as string}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

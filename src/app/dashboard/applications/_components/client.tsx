@@ -30,6 +30,8 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
 import type { Application } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { doc, deleteDoc } from "firebase/firestore";
 
 type ApplicationsClientProps = {
   data: Application[];
@@ -48,15 +50,25 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
     app.jobType.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selectedApplication) return;
-    setApplications(applications.filter((app) => app.id !== selectedApplication.id));
-    toast({
-      title: "Application Deleted",
-      description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,
-    });
-    setIsDeleteDialogOpen(false);
-    setSelectedApplication(null);
+    try {
+      await deleteDoc(doc(db, "applications", selectedApplication.id));
+      setApplications(applications.filter((app) => app.id !== selectedApplication.id));
+      toast({
+        title: "Application Deleted",
+        description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,
+      });
+    } catch (error) {
+       toast({
+        title: "Error deleting application",
+        description: "There was a problem deleting the application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setSelectedApplication(null);
+    }
   };
 
   return (
@@ -84,39 +96,47 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredApplications.map((app) => (
-              <TableRow key={app.id}>
-                <TableCell>
-                  <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
-                  <div className="text-sm text-muted-foreground">{app.email}</div>
-                </TableCell>
-                <TableCell>{app.jobType}</TableCell>
-                <TableCell>{app.location}</TableCell>
-                <TableCell>{app.submittedAt}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onSelect={() => {
-                          setSelectedApplication(app);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {filteredApplications.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No applications found.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredApplications.map((app) => (
+                <TableRow key={app.id}>
+                  <TableCell>
+                    <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
+                    <div className="text-sm text-muted-foreground">{app.email}</div>
+                  </TableCell>
+                  <TableCell>{app.jobType}</TableCell>
+                  <TableCell>{app.location}</TableCell>
+                  <TableCell>{app.submittedAt as string}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onSelect={() => {
+                            setSelectedApplication(app);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

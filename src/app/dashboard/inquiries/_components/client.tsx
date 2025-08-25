@@ -30,6 +30,8 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
 import type { Inquiry } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { doc, deleteDoc } from "firebase/firestore";
 
 type InquiriesClientProps = {
   data: Inquiry[];
@@ -48,15 +50,26 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
     inq.jobTitles.join(', ').toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selectedInquiry) return;
-    setInquiries(inquiries.filter((inq) => inq.id !== selectedInquiry.id));
-    toast({
-      title: "Inquiry Deleted",
-      description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,
-    });
-    setIsDeleteDialogOpen(false);
-    setSelectedInquiry(null);
+
+    try {
+      await deleteDoc(doc(db, "inquiries", selectedInquiry.id));
+      setInquiries(inquiries.filter((inq) => inq.id !== selectedInquiry.id));
+      toast({
+        title: "Inquiry Deleted",
+        description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error deleting inquiry",
+        description: "There was a problem deleting the inquiry. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setSelectedInquiry(null);
+    }
   };
 
   return (
@@ -84,39 +97,47 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredInquiries.map((inq) => (
-              <TableRow key={inq.id}>
-                <TableCell>
-                  <div className="font-medium">{inq.contactPerson}</div>
-                  <div className="text-sm text-muted-foreground">{inq.email}</div>
-                </TableCell>
-                <TableCell>{inq.companyName}</TableCell>
-                <TableCell>{inq.jobTitles.join(', ')}</TableCell>
-                <TableCell>{inq.submittedAt}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onSelect={() => {
-                          setSelectedInquiry(inq);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+             {filteredInquiries.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No inquiries found.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredInquiries.map((inq) => (
+                <TableRow key={inq.id}>
+                  <TableCell>
+                    <div className="font-medium">{inq.contactPerson}</div>
+                    <div className="text-sm text-muted-foreground">{inq.email}</div>
+                  </TableCell>
+                  <TableCell>{inq.companyName}</TableCell>
+                  <TableCell>{inq.jobTitles.join(', ')}</TableCell>
+                  <TableCell>{inq.submittedAt as string}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onSelect={() => {
+                            setSelectedInquiry(inq);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

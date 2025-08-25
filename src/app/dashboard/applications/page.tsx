@@ -1,7 +1,9 @@
 import { ApplicationsClient } from './_components/client';
-import { applications } from '@/lib/data';
+import { getApplications } from '@/lib/data';
 
-export default function ApplicationsPage() {
+export default async function ApplicationsPage() {
+  const applications = await getApplications();
+  
   return (
     <div className="space-y-4">
       <div>

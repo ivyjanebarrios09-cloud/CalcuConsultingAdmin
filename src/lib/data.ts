@@ -1,20 +1,58 @@
 import type { Application, Inquiry, ContactMessage, OldApplication, OldInquiry, OldMessage } from './types';
+import admin from './firebase-admin';
+import { format } from 'date-fns';
 
-export const applications: Application[] = [
-  { id: 'APP001', firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', phone: '01234 567890', jobType: 'Chef de Partie', location: 'Central London', submittedAt: '2023-10-27' },
-  { id: 'APP002', firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', phone: '01234 567891', jobType: 'Frontend Developer', location: 'East London', submittedAt: '2023-10-26' },
-  { id: 'APP003', firstName: 'Peter', lastName: 'Jones', email: 'peter.jones@example.com', phone: '01234 567892', jobType: 'UI/UX Designer', location: 'West London', submittedAt: '2023-10-25' },
-];
+const db = admin.firestore();
 
-export const inquiries: Inquiry[] = [
-  { id: 'INQ001', companyName: 'Innovate Inc.', contactPerson: 'Alice Johnson', email: 'alice.j@innovate.com', phone: '01234 567893', jobTitles: ['Web Development', 'Cloud Consulting'], jobDescription: 'Looking for a skilled developer.', requiredSkills: 'React, Node.js', employmentType: 'permanent', submittedAt: '2023-10-28' },
-  { id: 'INQ002', companyName: 'Solutions Co.', contactPerson: 'Bob Williams', email: 'bob.w@solutions.co', phone: '01234 567894', jobTitles: ['Mobile App Development'], jobDescription: 'iOS and Android developer needed.', requiredSkills: 'Swift, Kotlin', employmentType: 'contract', submittedAt: '2023-10-27' },
-];
+function formatTimestamp(timestamp: admin.firestore.Timestamp): string {
+  if (!timestamp) return '';
+  return format(timestamp.toDate(), 'yyyy-MM-dd');
+}
 
-export const contactMessages: ContactMessage[] = [
-  { id: 'MSG001', name: 'Frank Harris', email: 'frank.h@email.com', phone: '01234 567895', message: 'Question about services', submittedAt: '2023-10-28' },
-  { id: 'MSG002', name: 'Grace Clark', email: 'grace.c@email.com', phone: '01234 567896', message: 'Partnership Proposal', submittedAt: '2023-10-27' },
-];
+export async function getApplications(): Promise<Application[]> {
+  const snapshot = await db.collection('applications').orderBy('submittedAt', 'desc').get();
+  if (snapshot.empty) {
+    return [];
+  }
+  return snapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      submittedAt: formatTimestamp(data.submittedAt),
+    } as Application;
+  });
+}
+
+export async function getInquiries(): Promise<Inquiry[]> {
+    const snapshot = await db.collection('inquiries').orderBy('submittedAt', 'desc').get();
+    if (snapshot.empty) {
+        return [];
+    }
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+        id: doc.id,
+        ...data,
+        submittedAt: formatTimestamp(data.submittedAt),
+        } as Inquiry;
+    });
+}
+
+export async function getContactMessages(): Promise<ContactMessage[]> {
+    const snapshot = await db.collection('contacts').orderBy('submittedAt', 'desc').get();
+    if (snapshot.empty) {
+        return [];
+    }
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+        id: doc.id,
+        ...data,
+        submittedAt: formatTimestamp(data.submittedAt),
+        } as ContactMessage;
+    });
+}
 
 
 // Old mock data, to be removed

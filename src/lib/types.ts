@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export type Application = {
   id: string;
   firstName: string;
@@ -6,7 +8,7 @@ export type Application = {
   phone: string;
   jobType: string;
   location: string;
-  submittedAt: string; // Using string for mock data, should be Firestore Timestamp
+  submittedAt: string | Timestamp;
 };
 
 export type Inquiry = {
@@ -20,7 +22,7 @@ export type Inquiry = {
   requiredSkills: string;
   employmentType: 'permanent' | 'temporary' | 'contract';
   additionalInfo?: string;
-  submittedAt: string; // Using string for mock data, should be Firestore Timestamp
+  submittedAt: string | Timestamp;
 };
 
 export type ContactMessage = {
@@ -29,7 +31,7 @@ export type ContactMessage = {
   email: string;
   phone: string;
   message: string;
-  submittedAt: string; // Using string for mock data, should be Firestore Timestamp
+  submittedAt: string | Timestamp;
 };
 
 // The old types are kept for now to avoid breaking existing pages
