@@ -8,7 +8,7 @@ export type Application = {
   phone: string;
   jobType: string;
   location: string;
-  submittedAt: string | Timestamp;
+  submittedAt: string;
 };
 
 export type Inquiry = {
@@ -22,7 +22,7 @@ export type Inquiry = {
   requiredSkills: string;
   employmentType: 'permanent' | 'temporary' | 'contract';
   additionalInfo?: string;
-  submittedAt: string | Timestamp;
+  submittedAt: string;
 };
 
 export type ContactMessage = {
@@ -31,5 +31,5 @@ export type ContactMessage = {
   email: string;
   phone: string;
   message: string;
-  submittedAt: string | Timestamp;
+  submittedAt: string;
 };

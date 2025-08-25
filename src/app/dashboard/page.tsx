@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Briefcase, HelpCircle, MessageSquare } from "lucide-react";
 import { getApplications, getInquiries, getContactMessages } from "@/lib/data";
+import type { Application, Inquiry } from "@/lib/types";
 
 export default async function Dashboard() {
   const applications = await getApplications();
@@ -57,27 +58,31 @@ export default async function Dashboard() {
             <CardTitle>Recent Applications</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Applicant</TableHead>
-                  <TableHead>Job Type</TableHead>
-                  <TableHead>Location</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentApplications.map((app) => (
-                  <TableRow key={app.id}>
-                    <TableCell>
-                      <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
-                      <div className="text-sm text-muted-foreground">{app.email}</div>
-                    </TableCell>
-                    <TableCell>{app.jobType}</TableCell>
-                    <TableCell>{app.location}</TableCell>
+             {recentApplications.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Applicant</TableHead>
+                    <TableHead>Job Type</TableHead>
+                    <TableHead>Location</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {recentApplications.map((app: Application) => (
+                    <TableRow key={app.id}>
+                      <TableCell>
+                        <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
+                        <div className="text-sm text-muted-foreground">{app.email}</div>
+                      </TableCell>
+                      <TableCell>{app.jobType}</TableCell>
+                      <TableCell>{app.location}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p>No recent applications.</p>
+            )}
           </CardContent>
         </Card>
 
@@ -86,27 +91,31 @@ export default async function Dashboard() {
             <CardTitle>Recent Inquiries</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentInquiries.map((inq) => (
-                  <TableRow key={inq.id}>
-                    <TableCell>
-                      <div className="font-medium">{inq.contactPerson}</div>
-                      <div className="text-sm text-muted-foreground">{inq.email}</div>
-                    </TableCell>
-                    <TableCell>{inq.companyName}</TableCell>
-                    <TableCell>{inq.submittedAt as string}</TableCell>
+            {recentInquiries.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Date</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {recentInquiries.map((inq: Inquiry) => (
+                    <TableRow key={inq.id}>
+                      <TableCell>
+                        <div className="font-medium">{inq.contactPerson}</div>
+                        <div className="text-sm text-muted-foreground">{inq.email}</div>
+                      </TableCell>
+                      <TableCell>{inq.companyName}</TableCell>
+                      <TableCell>{inq.submittedAt}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p>No recent inquiries.</p>
+            )}
           </CardContent>
         </Card>
       </div>
