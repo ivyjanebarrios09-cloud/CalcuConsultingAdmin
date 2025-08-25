@@ -10,7 +10,6 @@ import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +23,39 @@ export default function SignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [createUserWithEmailAndPassword, user, loading, error] = useCreateUserWithEmailAndPassword(auth);
+  const [isSignUpAllowed, setIsSignUpAllowed] = React.useState(false);
+  const [checking, setChecking] = React.useState(true);
+
+  React.useEffect(() => {
+    const checkUserExists = async () => {
+      try {
+        const response = await fetch('/api/auth/check-user');
+        const { hasUsers } = await response.json();
+        if (hasUsers) {
+          router.push('/sign-in');
+          toast({
+            title: 'Sign-up Disabled',
+            description: 'An admin account already exists. Please sign in.',
+            variant: 'destructive',
+          });
+        } else {
+          setIsSignUpAllowed(true);
+        }
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Could not verify admin existence. Please try again.',
+          variant: 'destructive',
+        });
+        router.push('/sign-in');
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    checkUserExists();
+  }, [router, toast]);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,6 +89,14 @@ export default function SignUpPage() {
       toast({ title: "Error creating account", description: error.message, variant: "destructive" });
     }
   }, [error, toast]);
+  
+  if (checking) {
+    return (
+       <div className="flex flex-col min-h-screen items-center justify-center">
+        <div className="text-2xl font-bold">Checking admin status...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -68,39 +108,45 @@ export default function SignUpPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={loading}>
-                 {loading ? "Creating account..." : "Create an account"}
-              </Button>
-            </form>
-          </Form>
+          {isSignUpAllowed ? (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="m@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Creating account..." : "Create an account"}
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <div className="text-center text-muted-foreground">
+              Sign-up is disabled because an admin account already exists.
+            </div>
+          )}
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/sign-in" className="underline">
