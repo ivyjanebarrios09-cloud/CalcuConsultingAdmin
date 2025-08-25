@@ -86,7 +86,7 @@ export default function SignUpPage() {
           body: JSON.stringify({ token }),
         });
         toast({ title: "Account created successfully!" });
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }
     } catch (e: any) {
       toast({ title: "Error creating account", description: e.message, variant: "destructive" });

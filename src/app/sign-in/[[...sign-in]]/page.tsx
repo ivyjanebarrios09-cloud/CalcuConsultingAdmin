@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +20,6 @@ const formSchema = z.object({
 });
 
 export default function SignInPage() {
-  const router = useRouter();
   const { toast } = useToast();
   const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth);
 
@@ -45,7 +43,7 @@ export default function SignInPage() {
           body: JSON.stringify({ token }),
         });
         toast({ title: "Signed in successfully!" });
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }
     } catch (e: any) {
        toast({ title: "Error signing in", description: e.message, variant: "destructive" });
