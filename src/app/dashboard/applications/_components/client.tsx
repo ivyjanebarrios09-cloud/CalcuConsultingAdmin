@@ -25,7 +25,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
@@ -44,9 +43,9 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
   const { toast } = useToast();
 
   const filteredApplications = applications.filter((app) =>
-    app.name.toLowerCase().includes(search.toLowerCase()) ||
+    `${app.firstName} ${app.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     app.email.toLowerCase().includes(search.toLowerCase()) ||
-    app.position.toLowerCase().includes(search.toLowerCase())
+    app.jobType.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleDelete = () => {
@@ -54,7 +53,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
     setApplications(applications.filter((app) => app.id !== selectedApplication.id));
     toast({
       title: "Application Deleted",
-      description: `Application from ${selectedApplication.name} has been deleted.`,
+      description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,
     });
     setIsDeleteDialogOpen(false);
     setSelectedApplication(null);
@@ -78,9 +77,9 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Applicant</TableHead>
-              <TableHead>Position</TableHead>
+              <TableHead>Job Type</TableHead>
+              <TableHead>Location</TableHead>
               <TableHead>Date Applied</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -88,20 +87,12 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
             {filteredApplications.map((app) => (
               <TableRow key={app.id}>
                 <TableCell>
-                  <div className="font-medium">{app.name}</div>
+                  <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
                   <div className="text-sm text-muted-foreground">{app.email}</div>
                 </TableCell>
-                <TableCell>{app.position}</TableCell>
-                <TableCell>{app.date}</TableCell>
-                <TableCell>
-                   <Badge variant={
-                      app.status === 'Reviewed' ? 'default' : 
-                      app.status === 'Pending' ? 'secondary' : 
-                      'destructive'
-                    }>
-                      {app.status}
-                    </Badge>
-                </TableCell>
+                <TableCell>{app.jobType}</TableCell>
+                <TableCell>{app.location}</TableCell>
+                <TableCell>{app.submittedAt}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -136,7 +127,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the application from{' '}
-              <span className="font-semibold">{selectedApplication?.name}</span>.
+              <span className="font-semibold">{selectedApplication?.firstName} {selectedApplication?.lastName}</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -28,24 +28,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
-import type { Message } from "@/lib/types";
+import type { ContactMessage } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 type MessagesClientProps = {
-  data: Message[];
+  data: ContactMessage[];
 };
 
 export function MessagesClient({ data }: MessagesClientProps) {
   const [messages, setMessages] = React.useState(data);
   const [search, setSearch] = React.useState("");
-  const [selectedMessage, setSelectedMessage] = React.useState<Message | null>(null);
+  const [selectedMessage, setSelectedMessage] = React.useState<ContactMessage | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
 
   const filteredMessages = messages.filter((msg) =>
     msg.name.toLowerCase().includes(search.toLowerCase()) ||
     msg.email.toLowerCase().includes(search.toLowerCase()) ||
-    msg.subject.toLowerCase().includes(search.toLowerCase())
+    msg.message.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleDelete = () => {
@@ -77,7 +77,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Sender</TableHead>
-              <TableHead>Subject</TableHead>
+              <TableHead>Message</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -89,8 +89,8 @@ export function MessagesClient({ data }: MessagesClientProps) {
                   <div className="font-medium">{msg.name}</div>
                   <div className="text-sm text-muted-foreground">{msg.email}</div>
                 </TableCell>
-                <TableCell>{msg.subject}</TableCell>
-                <TableCell>{msg.date}</TableCell>
+                <TableCell className="max-w-xs truncate">{msg.message}</TableCell>
+                <TableCell>{msg.submittedAt}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

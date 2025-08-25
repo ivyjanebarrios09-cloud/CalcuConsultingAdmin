@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Briefcase, HelpCircle, MessageSquare } from "lucide-react";
-import { applications, inquiries, messages } from "@/lib/data";
-import { Badge } from "@/components/ui/badge";
+import { applications, inquiries, contactMessages } from "@/lib/data";
 
 export default function Dashboard() {
   const recentApplications = applications.slice(0, 5);
@@ -42,7 +41,7 @@ export default function Dashboard() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{messages.length}</div>
+            <div className="text-2xl font-bold">{contactMessages.length}</div>
             <p className="text-xs text-muted-foreground">Total messages in your inbox.</p>
           </CardContent>
         </Card>
@@ -58,27 +57,19 @@ export default function Dashboard() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Applicant</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Job Type</TableHead>
+                  <TableHead>Location</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {recentApplications.map((app) => (
                   <TableRow key={app.id}>
                     <TableCell>
-                      <div className="font-medium">{app.name}</div>
+                      <div className="font-medium">{`${app.firstName} ${app.lastName}`}</div>
                       <div className="text-sm text-muted-foreground">{app.email}</div>
                     </TableCell>
-                    <TableCell>{app.position}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        app.status === 'Reviewed' ? 'default' : 
-                        app.status === 'Pending' ? 'secondary' : 
-                        'destructive'
-                      }>
-                        {app.status}
-                      </Badge>
-                    </TableCell>
+                    <TableCell>{app.jobType}</TableCell>
+                    <TableCell>{app.location}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -95,7 +86,7 @@ export default function Dashboard() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Client</TableHead>
-                  <TableHead>Service</TableHead>
+                  <TableHead>Company</TableHead>
                   <TableHead>Date</TableHead>
                 </TableRow>
               </TableHeader>
@@ -103,11 +94,11 @@ export default function Dashboard() {
                 {recentInquiries.map((inq) => (
                   <TableRow key={inq.id}>
                     <TableCell>
-                      <div className="font-medium">{inq.name}</div>
-                      <div className="text-sm text-muted-foreground">{inq.company}</div>
+                      <div className="font-medium">{inq.contactPerson}</div>
+                      <div className="text-sm text-muted-foreground">{inq.email}</div>
                     </TableCell>
-                    <TableCell>{inq.service}</TableCell>
-                    <TableCell>{inq.date}</TableCell>
+                    <TableCell>{inq.companyName}</TableCell>
+                    <TableCell>{inq.submittedAt}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -1,27 +1,29 @@
-import type { Application, Inquiry, Message } from './types';
+import type { Application, Inquiry, ContactMessage, OldApplication, OldInquiry, OldMessage } from './types';
 
 export const applications: Application[] = [
-  { id: 'APP001', name: 'John Doe', email: 'john.doe@example.com', position: 'Frontend Developer', date: '2023-10-27', status: 'Reviewed' },
-  { id: 'APP002', name: 'Jane Smith', email: 'jane.smith@example.com', position: 'Backend Developer', date: '2023-10-26', status: 'Pending' },
-  { id: 'APP003', name: 'Peter Jones', email: 'peter.jones@example.com', position: 'UI/UX Designer', date: '2023-10-25', status: 'Rejected' },
-  { id: 'APP004', name: 'Mary Johnson', email: 'mary.johnson@example.com', position: 'Project Manager', date: '2023-10-24', status: 'Reviewed' },
-  { id: 'APP005', name: 'David Williams', email: 'david.williams@example.com', position: 'Frontend Developer', date: '2023-10-23', status: 'Pending' },
-  { id: 'APP006', name: 'Sarah Brown', email: 'sarah.brown@example.com', position: 'Data Scientist', date: '2023-10-22', status: 'Pending' },
-  { id: 'APP007', name: 'Michael Miller', email: 'michael.miller@example.com', position: 'Backend Developer', date: '2023-10-21', status: 'Reviewed' },
-  { id: 'APP008', name: 'Emily Davis', email: 'emily.davis@example.com', position: 'UI/UX Designer', date: '2023-10-20', status: 'Rejected' },
+  { id: 'APP001', firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', phone: '01234 567890', jobType: 'Chef de Partie', location: 'Central London', submittedAt: '2023-10-27' },
+  { id: 'APP002', firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', phone: '01234 567891', jobType: 'Frontend Developer', location: 'East London', submittedAt: '2023-10-26' },
+  { id: 'APP003', firstName: 'Peter', lastName: 'Jones', email: 'peter.jones@example.com', phone: '01234 567892', jobType: 'UI/UX Designer', location: 'West London', submittedAt: '2023-10-25' },
 ];
 
 export const inquiries: Inquiry[] = [
-  { id: 'INQ001', name: 'Alice Johnson', company: 'Innovate Inc.', email: 'alice.j@innovate.com', service: 'Web Development', date: '2023-10-28' },
-  { id: 'INQ002', name: 'Bob Williams', company: 'Solutions Co.', email: 'bob.w@solutions.co', service: 'Cloud Consulting', date: '2023-10-27' },
-  { id: 'INQ003', name: 'Charlie Brown', company: 'Tech Forward', email: 'charlie.b@techforward.com', service: 'Mobile App Development', date: '2023-10-26' },
-  { id: 'INQ004', name: 'Diana Miller', company: 'Global Solutions', email: 'diana.m@globalsolutions.com', service: 'SEO Optimization', date: '2023-10-25' },
-  { id: 'INQ005', name: 'Ethan Wilson', company: 'NextGen Systems', email: 'ethan.w@nextgen.com', service: 'Web Development', date: '2023-10-24' },
+  { id: 'INQ001', companyName: 'Innovate Inc.', contactPerson: 'Alice Johnson', email: 'alice.j@innovate.com', phone: '01234 567893', jobTitles: ['Web Development', 'Cloud Consulting'], jobDescription: 'Looking for a skilled developer.', requiredSkills: 'React, Node.js', employmentType: 'permanent', submittedAt: '2023-10-28' },
+  { id: 'INQ002', companyName: 'Solutions Co.', contactPerson: 'Bob Williams', email: 'bob.w@solutions.co', phone: '01234 567894', jobTitles: ['Mobile App Development'], jobDescription: 'iOS and Android developer needed.', requiredSkills: 'Swift, Kotlin', employmentType: 'contract', submittedAt: '2023-10-27' },
 ];
 
-export const messages: Message[] = [
+export const contactMessages: ContactMessage[] = [
+  { id: 'MSG001', name: 'Frank Harris', email: 'frank.h@email.com', phone: '01234 567895', message: 'Question about services', submittedAt: '2023-10-28' },
+  { id: 'MSG002', name: 'Grace Clark', email: 'grace.c@email.com', phone: '01234 567896', message: 'Partnership Proposal', submittedAt: '2023-10-27' },
+];
+
+
+// Old mock data, to be removed
+export const oldApplications: OldApplication[] = [
+  { id: 'APP001', name: 'John Doe', email: 'john.doe@example.com', position: 'Frontend Developer', date: '2023-10-27', status: 'Reviewed' },
+];
+export const oldInquiries: OldInquiry[] = [
+  { id: 'INQ001', name: 'Alice Johnson', company: 'Innovate Inc.', email: 'alice.j@innovate.com', service: 'Web Development', date: '2023-10-28' },
+];
+export const oldMessages: OldMessage[] = [
   { id: 'MSG001', name: 'Frank Harris', email: 'frank.h@email.com', subject: 'Question about services', date: '2023-10-28' },
-  { id: 'MSG002', name: 'Grace Clark', email: 'grace.c@email.com', subject: 'Partnership Proposal', date: '2023-10-27' },
-  { id: 'MSG003', name: 'Henry Lewis', email: 'henry.l@email.com', subject: 'Feedback on website', date: '2023-10-26' },
-  { id: 'MSG004', name: 'Ivy Walker', email: 'ivy.w@email.com', subject: 'Request for Quote', date: '2023-10-25' },
 ];

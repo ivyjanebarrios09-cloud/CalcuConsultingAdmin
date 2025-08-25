@@ -1,5 +1,5 @@
 import { MessagesClient } from './_components/client';
-import { messages } from '@/lib/data';
+import { contactMessages } from '@/lib/data';
 
 export default function MessagesPage() {
   return (
@@ -8,7 +8,7 @@ export default function MessagesPage() {
         <h1 className="text-3xl font-bold tracking-tight">Contact Messages</h1>
         <p className="text-muted-foreground">View and manage all contact messages.</p>
       </div>
-      <MessagesClient data={messages} />
+      <MessagesClient data={contactMessages} />
     </div>
   );
 }

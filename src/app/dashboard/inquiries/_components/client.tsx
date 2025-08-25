@@ -43,9 +43,9 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
   const { toast } = useToast();
 
   const filteredInquiries = inquiries.filter((inq) =>
-    inq.name.toLowerCase().includes(search.toLowerCase()) ||
-    inq.company.toLowerCase().includes(search.toLowerCase()) ||
-    inq.service.toLowerCase().includes(search.toLowerCase())
+    inq.contactPerson.toLowerCase().includes(search.toLowerCase()) ||
+    inq.companyName.toLowerCase().includes(search.toLowerCase()) ||
+    inq.jobTitles.join(', ').toLowerCase().includes(search.toLowerCase())
   );
 
   const handleDelete = () => {
@@ -53,7 +53,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
     setInquiries(inquiries.filter((inq) => inq.id !== selectedInquiry.id));
     toast({
       title: "Inquiry Deleted",
-      description: `Inquiry from ${selectedInquiry.name} has been deleted.`,
+      description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,
     });
     setIsDeleteDialogOpen(false);
     setSelectedInquiry(null);
@@ -76,9 +76,9 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Client</TableHead>
+              <TableHead>Contact Person</TableHead>
               <TableHead>Company</TableHead>
-              <TableHead>Service</TableHead>
+              <TableHead>Job Titles</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -87,12 +87,12 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
             {filteredInquiries.map((inq) => (
               <TableRow key={inq.id}>
                 <TableCell>
-                  <div className="font-medium">{inq.name}</div>
+                  <div className="font-medium">{inq.contactPerson}</div>
                   <div className="text-sm text-muted-foreground">{inq.email}</div>
                 </TableCell>
-                <TableCell>{inq.company}</TableCell>
-                <TableCell>{inq.service}</TableCell>
-                <TableCell>{inq.date}</TableCell>
+                <TableCell>{inq.companyName}</TableCell>
+                <TableCell>{inq.jobTitles.join(', ')}</TableCell>
+                <TableCell>{inq.submittedAt}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -127,7 +127,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the inquiry from{' '}
-              <span className="font-semibold">{selectedInquiry?.name}</span>.
+              <span className="font-semibold">{selectedInquiry?.contactPerson}</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
