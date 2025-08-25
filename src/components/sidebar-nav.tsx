@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { LayoutDashboard, FileText, Users, Mail, LogOut } from "lucide-react";
-import { useClerk } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
 
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -23,7 +23,7 @@ const menuItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const { signOut } = useClerk();
+  const { signOut } = useAuth();
 
   return (
     <>
@@ -52,7 +52,7 @@ export function SidebarNav() {
         <Separator className="my-2" />
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => signOut({ redirectUrl: '/' })} tooltip={{ children: "Logout", side: "right" }}>
+            <SidebarMenuButton onClick={() => signOut()} tooltip={{ children: "Logout", side: "right" }}>
               <LogOut />
               <span>Logout</span>
             </SidebarMenuButton>
