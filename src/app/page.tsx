@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="p-4 flex justify-between items-center border-b">
-        <h1 className="text-2xl font-bold text-primary">CalcuConsultingAdmin</h1>
+        <h1 className="text-2xl font-bold text-foreground">CalcuConsultingAdmin</h1>
         {!user ? (
           <Button asChild>
             <Link href="/sign-in">Login</Link>
