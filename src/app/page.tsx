@@ -19,32 +19,32 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="p-4 flex justify-between items-center border-b bg-primary text-primary-foreground">
+      <header className="p-4 flex justify-between items-center border-b bg-background text-primary">
         <h1 className="text-2xl font-bold">CalcuConsultingAdmin</h1>
         {!user ? (
-          <Button asChild variant="secondary">
+          <Button asChild variant="default">
             <Link href="/sign-in">Login</Link>
           </Button>
         ) : (
-          <Button asChild variant="secondary">
+          <Button asChild variant="default">
             <Link href="/dashboard">Go to Dashboard</Link>
           </Button>
         )}
       </header>
-      <main className="flex-grow flex items-center justify-center bg-primary text-primary-foreground">
+      <main className="flex-grow flex items-center justify-center bg-background text-foreground">
         <div className="text-center p-8 max-w-2xl">
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-primary">
             Welcome to the Admin Panel
           </h2>
-          <p className="text-lg text-primary-foreground/90 mb-8">
+          <p className="text-lg text-muted-foreground mb-8">
             Manage your applications, inquiries, and messages with ease. This is the central hub for all administrative tasks for CalcuConsulting.
           </p>
           {!user ? (
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild size="lg" variant="default">
               <Link href="/sign-in">Get Started</Link>
             </Button>
           ) : (
-             <Button asChild size="lg" variant="secondary">
+             <Button asChild size="lg" variant="default">
               <Link href="/dashboard">Go to Dashboard</Link>
             </Button>
           )}
