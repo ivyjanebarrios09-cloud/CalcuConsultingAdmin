@@ -83,7 +83,7 @@ export default async function Dashboard() {
                 </TableBody>
               </Table>
             ) : (
-              <p>No recent applications.</p>
+              <p className="text-sm text-muted-foreground">No recent applications.</p>
             )}
           </CardContent>
         </Card>
@@ -118,7 +118,7 @@ export default async function Dashboard() {
                 </TableBody>
               </Table>
             ) : (
-              <p>No recent inquiries.</p>
+              <p className="text-sm text-muted-foreground">No recent inquiries.</p>
             )}
           </CardContent>
         </Card>
