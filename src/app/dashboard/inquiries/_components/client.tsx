@@ -44,6 +44,10 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
 
+  React.useEffect(() => {
+    setInquiries(data);
+  }, [data]);
+
   const filteredInquiries = inquiries.filter((inq) =>
     inq.contactPerson.toLowerCase().includes(search.toLowerCase()) ||
     inq.companyName.toLowerCase().includes(search.toLowerCase()) ||
@@ -57,7 +61,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
 
     try {
       await deleteDoc(doc(db, "inquiries", selectedInquiry.id));
-      setInquiries(inquiries.filter((inq) => inq.id !== selectedInquiry.id));
+      setInquiries((prevInquiries) => prevInquiries.filter((inq) => inq.id !== selectedInquiry.id));
       toast({
         title: "Inquiry Deleted",
         description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,

@@ -44,6 +44,10 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
 
+  React.useEffect(() => {
+    setApplications(data);
+  }, [data]);
+
   const filteredApplications = applications.filter((app) =>
     `${app.firstName} ${app.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     app.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -55,7 +59,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
     if (!selectedApplication) return;
     try {
       await deleteDoc(doc(db, "applications", selectedApplication.id));
-      setApplications(applications.filter((app) => app.id !== selectedApplication.id));
+      setApplications((prevApplications) => prevApplications.filter((app) => app.id !== selectedApplication.id));
       toast({
         title: "Application Deleted",
         description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,

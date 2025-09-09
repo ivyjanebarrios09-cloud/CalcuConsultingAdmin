@@ -44,6 +44,10 @@ export function MessagesClient({ data }: MessagesClientProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
 
+  React.useEffect(() => {
+    setMessages(data);
+  }, [data]);
+
   const filteredMessages = messages.filter((msg) =>
     msg.name.toLowerCase().includes(search.toLowerCase()) ||
     msg.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -55,7 +59,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
     if (!selectedMessage) return;
     try {
       await deleteDoc(doc(db, "contacts", selectedMessage.id));
-      setMessages(messages.filter((msg) => msg.id !== selectedMessage.id));
+      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== selectedMessage.id));
       toast({
         title: "Message Deleted",
         description: `Message from ${selectedMessage.name} has been deleted.`,
