@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -31,20 +30,19 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
 import type { Inquiry } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
-import { doc, deleteDoc } from "firebase/firestore";
+import { deleteInquiryAction } from "../actions";
 
 type InquiriesClientProps = {
   data: Inquiry[];
 };
 
 export function InquiriesClient({ data }: InquiriesClientProps) {
-  const router = useRouter();
   const [inquiries, setInquiries] = React.useState(data);
   const [search, setSearch] = React.useState("");
   const [selectedInquiry, setSelectedInquiry] = React.useState<Inquiry | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
+  const [isPending, startTransition] = React.useTransition();
 
   React.useEffect(() => {
     setInquiries(data);
@@ -60,24 +58,24 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
 
   const handleDelete = async () => {
     if (!selectedInquiry) return;
-
-    try {
-      await deleteDoc(doc(db, "inquiries", selectedInquiry.id));
-      toast({
-        title: "Inquiry Deleted",
-        description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,
-      });
-      router.refresh(); // This will re-fetch the data on the server
-    } catch (error) {
-      toast({
-        title: "Error deleting inquiry",
-        description: "There was a problem deleting the inquiry. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+    
+    startTransition(async () => {
+      const result = await deleteInquiryAction(selectedInquiry.id);
+      if (result.success) {
+        toast({
+          title: "Inquiry Deleted",
+          description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,
+        });
+      } else {
+        toast({
+          title: "Error deleting inquiry",
+          description: result.error,
+          variant: "destructive",
+        });
+      }
       setIsDeleteDialogOpen(false);
       setSelectedInquiry(null);
-    }
+    });
   };
 
   return (
@@ -126,7 +124,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button variant="ghost" className="h-8 w-8 p-0" disabled={isPending}>
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -138,6 +136,7 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
                             setSelectedInquiry(inq);
                             setIsDeleteDialogOpen(true);
                           }}
+                          disabled={isPending}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
@@ -162,9 +161,13 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-              Delete
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              disabled={isPending}
+            >
+              {isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

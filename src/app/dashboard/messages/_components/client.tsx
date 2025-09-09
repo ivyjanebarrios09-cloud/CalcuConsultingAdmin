@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -31,20 +30,19 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
 import type { ContactMessage } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
-import { doc, deleteDoc } from "firebase/firestore";
+import { deleteMessageAction } from "../actions";
 
 type MessagesClientProps = {
   data: ContactMessage[];
 };
 
 export function MessagesClient({ data }: MessagesClientProps) {
-  const router = useRouter();
   const [messages, setMessages] = React.useState(data);
   const [search, setSearch] = React.useState("");
   const [selectedMessage, setSelectedMessage] = React.useState<ContactMessage | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
+  const [isPending, startTransition] = React.useTransition();
 
   React.useEffect(() => {
     setMessages(data);
@@ -59,23 +57,24 @@ export function MessagesClient({ data }: MessagesClientProps) {
 
   const handleDelete = async () => {
     if (!selectedMessage) return;
-    try {
-      await deleteDoc(doc(db, "contacts", selectedMessage.id));
-      toast({
-        title: "Message Deleted",
-        description: `Message from ${selectedMessage.name} has been deleted.`,
-      });
-      router.refresh(); // This will re-fetch the data on the server
-    } catch (error) {
-       toast({
-        title: "Error deleting message",
-        description: "There was a problem deleting the message. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+    
+    startTransition(async () => {
+      const result = await deleteMessageAction(selectedMessage.id);
+      if (result.success) {
+        toast({
+          title: "Message Deleted",
+          description: `Message from ${selectedMessage.name} has been deleted.`,
+        });
+      } else {
+        toast({
+          title: "Error deleting message",
+          description: result.error,
+          variant: "destructive",
+        });
+      }
       setIsDeleteDialogOpen(false);
       setSelectedMessage(null);
-    }
+    });
   };
 
   return (
@@ -122,7 +121,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button variant="ghost" className="h-8 w-8 p-0" disabled={isPending}>
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -134,6 +133,7 @@ export function MessagesClient({ data }: MessagesClientProps) {
                             setSelectedMessage(msg);
                             setIsDeleteDialogOpen(true);
                           }}
+                          disabled={isPending}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
@@ -158,9 +158,13 @@ export function MessagesClient({ data }: MessagesClientProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-              Delete
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              disabled={isPending}
+            >
+              {isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

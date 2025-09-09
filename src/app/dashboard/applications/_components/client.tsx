@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -31,20 +30,20 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal, Search, Trash2 } from "lucide-react";
 import type { Application } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
-import { doc, deleteDoc } from "firebase/firestore";
+import { deleteApplicationAction } from "../actions";
 
 type ApplicationsClientProps = {
   data: Application[];
 };
 
 export function ApplicationsClient({ data }: ApplicationsClientProps) {
-  const router = useRouter();
   const [applications, setApplications] = React.useState(data);
   const [search, setSearch] = React.useState("");
   const [selectedApplication, setSelectedApplication] = React.useState<Application | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
+  const [isPending, startTransition] = React.useTransition();
+
 
   React.useEffect(() => {
     setApplications(data);
@@ -59,23 +58,24 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
 
   const handleDelete = async () => {
     if (!selectedApplication) return;
-    try {
-      await deleteDoc(doc(db, "applications", selectedApplication.id));
-      toast({
-        title: "Application Deleted",
-        description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,
-      });
-      router.refresh(); // This will re-fetch the data on the server
-    } catch (error) {
-       toast({
-        title: "Error deleting application",
-        description: "There was a problem deleting the application. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+    
+    startTransition(async () => {
+      const result = await deleteApplicationAction(selectedApplication.id);
+      if (result.success) {
+        toast({
+          title: "Application Deleted",
+          description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,
+        });
+      } else {
+        toast({
+          title: "Error deleting application",
+          description: result.error,
+          variant: "destructive",
+        });
+      }
       setIsDeleteDialogOpen(false);
       setSelectedApplication(null);
-    }
+    });
   };
 
   return (
@@ -124,7 +124,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button variant="ghost" className="h-8 w-8 p-0" disabled={isPending}>
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -136,6 +136,7 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
                             setSelectedApplication(app);
                             setIsDeleteDialogOpen(true);
                           }}
+                          disabled={isPending}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
@@ -160,9 +161,13 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-              Delete
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              disabled={isPending}
+            >
+              {isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
