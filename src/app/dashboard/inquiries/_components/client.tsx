@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -38,6 +39,7 @@ type InquiriesClientProps = {
 };
 
 export function InquiriesClient({ data }: InquiriesClientProps) {
+  const router = useRouter();
   const [inquiries, setInquiries] = React.useState(data);
   const [search, setSearch] = React.useState("");
   const [selectedInquiry, setSelectedInquiry] = React.useState<Inquiry | null>(null);
@@ -61,11 +63,11 @@ export function InquiriesClient({ data }: InquiriesClientProps) {
 
     try {
       await deleteDoc(doc(db, "inquiries", selectedInquiry.id));
-      setInquiries((prevInquiries) => prevInquiries.filter((inq) => inq.id !== selectedInquiry.id));
       toast({
         title: "Inquiry Deleted",
         description: `Inquiry from ${selectedInquiry.contactPerson} has been deleted.`,
       });
+      router.refresh(); // This will re-fetch the data on the server
     } catch (error) {
       toast({
         title: "Error deleting inquiry",

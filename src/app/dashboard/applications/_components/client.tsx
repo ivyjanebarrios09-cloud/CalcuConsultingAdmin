@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -38,6 +39,7 @@ type ApplicationsClientProps = {
 };
 
 export function ApplicationsClient({ data }: ApplicationsClientProps) {
+  const router = useRouter();
   const [applications, setApplications] = React.useState(data);
   const [search, setSearch] = React.useState("");
   const [selectedApplication, setSelectedApplication] = React.useState<Application | null>(null);
@@ -59,11 +61,11 @@ export function ApplicationsClient({ data }: ApplicationsClientProps) {
     if (!selectedApplication) return;
     try {
       await deleteDoc(doc(db, "applications", selectedApplication.id));
-      setApplications((prevApplications) => prevApplications.filter((app) => app.id !== selectedApplication.id));
       toast({
         title: "Application Deleted",
         description: `Application from ${selectedApplication.firstName} ${selectedApplication.lastName} has been deleted.`,
       });
+      router.refresh(); // This will re-fetch the data on the server
     } catch (error) {
        toast({
         title: "Error deleting application",

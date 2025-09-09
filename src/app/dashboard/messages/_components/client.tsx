@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -38,6 +39,7 @@ type MessagesClientProps = {
 };
 
 export function MessagesClient({ data }: MessagesClientProps) {
+  const router = useRouter();
   const [messages, setMessages] = React.useState(data);
   const [search, setSearch] = React.useState("");
   const [selectedMessage, setSelectedMessage] = React.useState<ContactMessage | null>(null);
@@ -59,11 +61,11 @@ export function MessagesClient({ data }: MessagesClientProps) {
     if (!selectedMessage) return;
     try {
       await deleteDoc(doc(db, "contacts", selectedMessage.id));
-      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== selectedMessage.id));
       toast({
         title: "Message Deleted",
         description: `Message from ${selectedMessage.name} has been deleted.`,
       });
+      router.refresh(); // This will re-fetch the data on the server
     } catch (error) {
        toast({
         title: "Error deleting message",
